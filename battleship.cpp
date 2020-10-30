@@ -8,31 +8,216 @@ int * create_2d_array(const int rows, const int cols)
     return (int*)malloc(rows * cols *sizeof(int));
 }
 
+//Going east means increasing columns (j)
+bool checkEast(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
+{
+  int lastColShipTouches = currentCol + shipsize - 1;
+
+   for (int j = currentCol; j <= lastColShipTouches ; j++)
+   {
+       if (j == currentCol && currentCol > 0)
+       {
+          for (int left = j - 1; left >= (j - 3); left--)
+          {
+              if (*(board + currentRow * cols + left) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else if (j == lastColShipTouches && currentCol < cols)
+       {
+          for (int right = j + 1; right <= (j + 3); right++)
+          {
+              if (*(board + currentRow * cols + right) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else
+       {
+           for (int down = currentRow + 1; down <= (currentRow+ 3); down++)
+           {
+               if (*(board + down * cols + j) == 1)
+               {
+                   return false;
+               }
+           }
+           for (int up = currentRow - 1; up >= (currentRow - 3); up--)
+           {
+               if (*(board + up * cols + j) == 1)
+               {
+                   return false;
+               }
+           }
+       }
+       
+   }
+}
+
+bool checkWest(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
+{
+  int lastColShipTouches = currentCol - shipsize + 1;
+
+   for (int j = currentCol; j >= lastColShipTouches ; j--)
+   {
+       if (j == lastColShipTouches && currentCol < 0)
+       {
+          for (int left = j - 1; left >= (j - 3); left--)
+          {
+              if (*(board + currentRow * cols + left) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else if (j == currentCol && currentCol > col)
+       {
+          for (int right = j + 1; right <= (j + 3); right++)
+          {
+              if (*(board + currentRow * cols + right) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else
+       {
+           for (int down = currentRow + 1; down <= (currentRow+ 3); down++)
+           {
+               if (*(board + down * cols + j) == 1)
+               {
+                   return false;
+               }
+           }
+           for (int up = currentRow - 1; up >= (currentRow - 3); up--)
+           {
+               if (*(board + up * cols + j) == 1)
+               {
+                   return false;
+               }
+           }
+       }
+       
+   }
+}
+
+bool checkSouth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
+{
+   int lastRowShipTouches = currentRow + shipsize - 1;
+
+   for (int i = currentRow; i <= lastRowShipTouches ; i++)
+   {
+       if (i == lastRowShipTouches && currentRow > 0)
+       {
+          for (int down = i + 1; down <= (i + 3); down++)
+          {
+              if (*(board + down * cols + currentCol) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else if (i == currentRow && currentRow < rows)
+       {
+          for (int up = i - 1; up >= (i - 3); up--)
+          {
+              if (*(board + up * cols + currentCol) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else
+       {
+           for (int right = currentCol + 1; right <= (currentCol+ 3); right++)
+           {
+               if (*(board + i * cols + right) == 1)
+               {
+                   return false;
+               }
+           }
+           for (int left = currentCol - 1; left >= (currentCol - 3); left--)
+           {
+               if (*(board + i * cols + left) == 1)
+               {
+                   return false;
+               }
+           }
+       }
+       
+   }
+}
+
+//GOING NORTH MEANS DECREASING ROWS {i}
+bool checkNorth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
+{
+   int lastRowShipTouches = currentRow - shipsize + 1;
+
+   for (int i = currentRow; i >= lastRowShipTouches ; i--)
+   {
+       if (i == currentRow && currentRow < rows)
+       {
+          for (int down = i + 1; down <= (i + 3); down++)
+          {
+              if (*(board + down * cols + currentCol) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else if (i == lastRowShipTouches && currentRow > 0)
+       {
+          for (int up = i - 1; up >= (i - 3); up--)
+          {
+              if (*(board + up * cols + currentCol) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else
+       {
+           for (int right = currentCol + 1; right <= (currentCol+ 3); right++)
+           {
+               if (*(board + i * cols + right) == 1)
+               {
+                   return false;
+               }
+           }
+           for (int left = currentCol - 1; left >= (currentCol - 3); left--)
+           {
+               if (*(board + i * cols + left) == 1)
+               {
+                   return false;
+               }
+           }
+       }
+       
+   }
+}
+
 char * avaliableDirections(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
     char directions [4] = {'n','s','e','w'};
-
-
-
-    return avalDirections;
-}
-
-
-bool checkEast(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
-{
-  for (int i)
-}
-
-//GOING NORTH MEANS DECREASING I
-bool checkNorth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
-{
-   int spaceNeeded = (3 + shipSize) * -1;
-   
-
-   for (int i = currentRow; i <= spaceNeeded; i++)
-   {
-
-   }
+    if (!checkNorth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol))
+    {
+        directions[0] = 'x';
+    }
+    if (!checkSouth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol))
+    {
+        directions[1] = 'x';
+    }
+    if (!checkEast(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol))
+    {
+        directions[2] = 'x';
+    }
+    if (!checkWest(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol))
+    {
+        directions[3] = 'x';
+    }
+    return directions;
 }
 
 bool shipsLeft(int * ships)  //checks if any ships are left to spawn
@@ -49,18 +234,9 @@ bool shipsLeft(int * ships)  //checks if any ships are left to spawn
     return shipsLeft;
 }
 
-// int shipSize(int * ships)
-// {
-
-// }
-
 int * shipGen(int * array, const int rows, const int cols)
 {
     //The 5 ships are: Carrier (occupies 5 spaces), Battleship (4), Cruiser (3), Submarine (3), and Destroyer (2).
-
-    // int shipsToAdd = 5;
-    // int threeShips = 0; //this counts how many ships that are 3 spaces big are currently on the board, there should be 2 at the end
-    // bool spawnedBattleship = false, spawnedCarrier = false, spawnedDestroyer = false; //Keeps track of if all the other ships have spawned
 
     int ships [5] = {5,4,3,3,2};
 
@@ -92,7 +268,6 @@ void printBoard(int * array, const int rows,  const int cols)
 {
     for(int i = 0; i < rows; i++)
     {
-        //std::cout << "Row" <<i <<"\n";
         for(int j = 0; j < rows; j++)
         {
            std::cout << *(array + i * cols + j) <<" ";
@@ -115,7 +290,7 @@ int main()
 {
     int boardSize = 0;
 
-    std::cout << "How big do you want the board to be?\nEnter 1 number, boards will have equal width/length:";
+    std::cout << "How big do you want the board to be?\nEnter 1 number, boards will be square:";
     
     std::cin >> boardSize;
 
