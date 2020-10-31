@@ -115,8 +115,8 @@ bool checkWest(int * board, const int rows, const int cols, int shipSize, int cu
 
 bool checkSouth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
-    std::cout << "gagsada1111agaShips...\n";
     int lastRowShipTouches = currentRow + shipSize - 1;
+    
     if (lastRowShipTouches > rows)
   {
       return false;
@@ -124,7 +124,19 @@ bool checkSouth(int * board, const int rows, const int cols, int shipSize, int c
 
    for (int i = currentRow; i <= lastRowShipTouches ; i++)
    {
-       if (i == lastRowShipTouches && currentRow > 0)
+       if (i == currentRow && currentRow < rows)
+       {
+           std::cout << "in if\n";
+          for (int up = i - 1; up >= (i - 3); up--)
+          {
+              std::cout << "im in the else if for loop";
+              if (*(board + up * cols + currentCol) == 1)
+              {
+                  return false;
+              }
+          }
+       }
+       else if (i == lastRowShipTouches && currentRow > 0)
        {
           for (int down = i + 1; down <= (i + 3); down++)
           {
@@ -134,18 +146,11 @@ bool checkSouth(int * board, const int rows, const int cols, int shipSize, int c
               }
           }
        }
-       else if (i == currentRow && currentRow < rows)
-       {
-          for (int up = i - 1; up >= (i - 3); up--)
-          {
-              if (*(board + up * cols + currentCol) == 1)
-              {
-                  return false;
-              }
-          }
-       }
+       
+//gcc battleship.cpp -lstdc++
        else
        {
+           std::cout << "in else\n";
            for (int right = currentCol + 1; right <= (currentCol+ 3); right++)
            {
                if (*(board + i * cols + right) == 1)
@@ -161,15 +166,17 @@ bool checkSouth(int * board, const int rows, const int cols, int shipSize, int c
                }
            }
        }
+       std::cout << "gagsada1111333agaShips...\n";
        
    }
+   std::cout << "gagagllaShips...\n";
 }
 
 //GOING NORTH MEANS DECREASING ROWS {i}
 bool checkNorth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
-    std::cout << "gagagaShips...\n";
-   int lastRowShipTouches = currentRow - shipSize + 1;
+    int lastRowShipTouches = currentRow - shipSize + 1;
+   
      if (lastRowShipTouches < 0)
   {
       return false;
@@ -220,11 +227,11 @@ bool checkNorth(int * board, const int rows, const int cols, int shipSize, int c
 
 char * avaliableDirections(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
-    std::cout << "Adsadasdewwww1211 Ships...\n";
     char directions [4] = {'n','s','e','w'};
     if (!checkNorth(board, rows, cols, shipSize, currentRow, currentCol))
     {
         directions[0] = 'x';
+        std::cout << "no more north";
     }
     if (!checkSouth(board, rows, cols, shipSize, currentRow, currentCol))
     {
@@ -311,8 +318,7 @@ int * spawnShip(int * board, const int rows, const int cols, int currentRow, int
 int * shipGen(int * array, const int rows, const int cols)
 {
     //The 5 ships are: Carrier (occupies 5 spaces), Battleship (4), Cruiser (3), Submarine (3), and Destroyer (2).
-    std::cout << "Ass...\n";
-    int ships [5] = {5,4,3,3,2};
+    int ships[5] = {5,4,3,3,2};
 
     for(int i = 0; i < rows; i++)
     {
@@ -321,17 +327,14 @@ int * shipGen(int * array, const int rows, const int cols)
             //random ship gen
             if ((rand() % 100) > 50 && shipsLeft(ships))
             {
-                std::cout << "Ass Ships...\n";
                 int randoShipsIndex = rand() % 4;
                 while (ships[randoShipsIndex] == 0)
                 {
                     randoShipsIndex = rand() % 4;
-                    std::cout << "Assssss Ships...\n";
                 }
-                std::cout << "Asss Ships...\n";
 
                 char * avalDirections = avaliableDirections(array,rows,cols,ships[randoShipsIndex],i,j);
-                std::cout << "Assasdas Ships...\n";
+                std::cout << "done with aval directions\n";
 
                 if (canThisShipSpawn(avalDirections))
                 {
@@ -366,9 +369,7 @@ void printBoard(int * array, const int rows,  const int cols)
 
 int * boardGen(int size)
 {
-    std::cout << "BoardGen\n";
     int * board = create_2d_array(size, size);
-    board = shipGen(board,size,size);
 
     return board;
 }
@@ -381,7 +382,9 @@ int main()
     
     std::cin >> boardSize;
 
+
     int * board = boardGen(boardSize);
+    board = shipGen(board,boardSize,boardSize);
     printBoard(board, boardSize, boardSize);
 
     return 0;
