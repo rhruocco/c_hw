@@ -12,13 +12,14 @@ int * create_2d_array(const int rows, const int cols)
 //they check to see if a ship can be spawned facing that direction
 bool checkEast(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
+    bool canSpawn = true;
     //this int is the end of the ship, the offset at the end is cause the loops below start at the currentposition on the board
   int lastColShipTouches = currentCol + shipSize - 1;
 
   if (lastColShipTouches > cols)
   {
       //checks to see if the last ship would be outside the board, returns false
-      return false;
+      canSpawn = false;
   }
 
 //this is the big loop that checks the current spot on the board's surroundings
@@ -32,7 +33,7 @@ bool checkEast(int * board, const int rows, const int cols, int shipSize, int cu
               std::cout << "in for";
               if (*(board + currentRow * cols + left) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -44,7 +45,7 @@ bool checkEast(int * board, const int rows, const int cols, int shipSize, int cu
           {
               if (*(board + currentRow * cols + right) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -56,29 +57,31 @@ bool checkEast(int * board, const int rows, const int cols, int shipSize, int cu
            {
                if (*(board + down * cols + j) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
            for (int up = currentRow - 1; up >= (currentRow - 3); up--)
            {
                if (*(board + up * cols + j) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
        }
        
    }
+   return canSpawn;
 }
 
 
 //edit of checkEast
 bool checkWest(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
+    bool canSpawn = true;
   int lastColShipTouches = currentCol - shipSize + 1;
   if (lastColShipTouches < 0)
   {
-      return false;
+      canSpawn = false;
   }
 
    for (int j = currentCol; j >= lastColShipTouches ; j--)
@@ -90,7 +93,7 @@ bool checkWest(int * board, const int rows, const int cols, int shipSize, int cu
               std::cout << "hi";
               if (*(board + currentRow * cols + left) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -100,7 +103,7 @@ bool checkWest(int * board, const int rows, const int cols, int shipSize, int cu
           {
               if (*(board + currentRow * cols + right) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -110,29 +113,31 @@ bool checkWest(int * board, const int rows, const int cols, int shipSize, int cu
            {
                if (*(board + down * cols + j) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
            for (int up = currentRow - 1; up >= (currentRow - 3); up--)
            {
                if (*(board + up * cols + j) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
        }
        
    }
+   return canSpawn;
 }
 
 //edit of checkEast
 bool checkSouth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
+    bool canSpawn = true;
     int lastRowShipTouches = currentRow + shipSize - 1;
 
     if (lastRowShipTouches > rows)
   {
-      return false;
+      canSpawn = false;
   }
 
    for (int i = currentRow; i <= lastRowShipTouches; i++)
@@ -145,7 +150,7 @@ bool checkSouth(int * board, const int rows, const int cols, int shipSize, int c
               std::cout << "im in the else if for loop";
               if (*(board + up * cols + currentCol) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -155,7 +160,7 @@ bool checkSouth(int * board, const int rows, const int cols, int shipSize, int c
           {
               if (*(board + down * cols + currentCol) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -167,28 +172,30 @@ bool checkSouth(int * board, const int rows, const int cols, int shipSize, int c
            {
                if (*(board + i * cols + right) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
            for (int left = currentCol - 1; left >= (currentCol - 3); left--)
            {
                if (*(board + i * cols + left) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
        }    
    }
+   return canSpawn;
 }
 
 //edit of checkEast
 bool checkNorth(int * board, const int rows, const int cols, int shipSize, int currentRow, int currentCol)
 {
+    bool canSpawn = true;
     int lastRowShipTouches = currentRow + shipSize - 1;
    
      if (lastRowShipTouches > rows)
   {
-      return false;
+      canSpawn = false;
   }
 
    for (int i = currentRow; i <= lastRowShipTouches ; i++)
@@ -199,7 +206,7 @@ bool checkNorth(int * board, const int rows, const int cols, int shipSize, int c
           {
               if (*(board + down * cols + currentCol) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -209,7 +216,7 @@ bool checkNorth(int * board, const int rows, const int cols, int shipSize, int c
           {
               if (*(board + up * cols + currentCol) == 1)
               {
-                  return false;
+                  canSpawn = false;
               }
           }
        }
@@ -219,19 +226,20 @@ bool checkNorth(int * board, const int rows, const int cols, int shipSize, int c
            {
                if (*(board + i * cols + right) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
            for (int left = currentCol - 1; left >= (currentCol - 3); left--)
            {
                if (*(board + i * cols + left) == 1)
                {
-                   return false;
+                   canSpawn = false;
                }
            }
        }
        
    }
+   return canSpawn;
 }
 
 //this calls each direction's check to see which directions a ship can spawn in given its coordinates
