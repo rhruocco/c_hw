@@ -197,11 +197,63 @@ bool checkSouth(int shipSize, int currentRow, int currentCol)
 
 //The further south, the greater the row value
 //The further east, the greater the column value
-bool checker(int shipSize, int currentRow, int currentCol)
+bool checker(int shipSize, int currentRow, int currentCol, char direction)
 {
+    //this bool will be returned at the end. it'll remain true until something makes it false
     bool canSpawn = true;
-    int lastRowShipWillTouch = 0;
-    int lastColShipWillTouch = 0;
+
+    //THE BELOW VARIABLES ARE PARAMETERS FOR THE FOR LOOPS
+
+    //These project where the coordinates of the last piece of the ship will be if it's allowed to spawn, calculated below
+    //based on ship size, the coordinates of the bottom piece of the ship, and the direction it'll face.
+    int lastRowShipTouches = 0;
+    int lastColShipTouches = 0;
+    
+
+
+    //These are variable for special checks that are only done at the first and last pieces of the ship
+    //It's only necessary for the front and back pieces of the ship to check 3 spaces in their aligntment (horizontal or vertical)
+    //(for example; a WEST facing ship would need to check 3 spaces EAST of the first piece of the ship, and 3 WEST of the last piece)
+    //The non-bordering pieces of the ship check 3 spaces horizontally (if the ship is vertical) or vertically (if ship is horizontal)
+    
+    //TO WHOEVER READS THIS, I REALLY HOPED I EXPLAINED THAT WELL.
+
+    int threeSpacesVerticalOfTheFirstPiece = 0;
+    int threeSpacesHorizontalOfTheFirstPiece = 0;
+
+    int threeSpacesVerticalOfTheLastPiece = 0;
+    int threeSpacesHorizontalOfTheLastPiece = 0;
+    
+    //this switch statement changes the values above based on which direction the ship will spawn in.
+    switch(direction)
+    {
+        case 'n':
+        lastRowShipTouches = currentRow + shipSize - 1;
+        threeSpacesVerticalOfTheFirstPiece = currentRow + 3;
+        threeSpacesVerticalOfTheLastPiece = lastRowShipTouches + 3;
+
+        case 's':
+        lastRowShipTouches =  currentRow + shipSize + 1;
+        threeSpacesVerticalOfTheFirstPiece = currentRow - 3;
+        threeSpacesVerticalOfTheLastPiece = lastRowShipTouches - 3;
+        
+        case 'e':
+        lastColShipTouches = currentCol  + shipSize -1;
+        threeSpacesHorizontalOfTheFirstPiece = currentCol - 3;
+        threeSpacesHorizontalOfTheLastPiece = lastColShipTouches + 3;
+
+        case 'w':
+        lastColShipTouches = currentCol - shipSize + 1;
+        threeSpacesHorizontalOfTheFirstPiece = currentCol + 3;
+        threeSpacesHorizontalOfTheLastPiece = lastColShipTouches - 3;
+    }
+
+    //if the end piece of the ship will be out of bounds, the ship cannot spawn
+    if (lastRowShipTouches > boardSize || lastRowShipTouches < 0 || lastColShipTouches > boardSize || lastColShipTouches < 0)
+    {
+        canSpawn = false;
+    }
+    return canSpawn;
 }
 
 //edit of checkEast
@@ -260,28 +312,21 @@ bool checkNorth(int shipSize, int currentRow, int currentCol)
 }
 
 //this calls each direction's check to see which directions a ship can spawn in given its coordinates
-char * avaliableDirections(int shipSize, int currentRow, int currentCol)
+char * checkAvaliableDirections(int shipSize, int currentRow, int currentCol)
 {
     //a list of all the directions
     char directions [4] = {'n','s','e','w'};
-    if (!checkNorth(shipSize, currentRow, currentCol))
+    for (int i = 0; i < 4; i++)
     {
-        directions[0] = 'x';
-    }
-    if (!checkSouth(shipSize, currentRow, currentCol))
-    {
-        directions[1] = 'x';
-    }
-    if (!checkEast(shipSize, currentRow, currentCol))
-    {
-        directions[2] = 'x';
-    }
-    if (!checkWest(shipSize, currentRow, currentCol))
-    {
-        directions[3] = 'x';
+        if (!checker(shipSize, currentRow, currentCol, directions[i]))
+        {
+            directions[i] = 'x';
+            std::cout << "test" <<i;
+            //replacing a direction with an x means that it cant spawn a ship in that direction.
+        }
     }
 
-    //replacing a direction with an x means that it cant spawn a ship in that direction. it returns the modified directions list
+    //it returns the modified directions list, with all the non-spawnable directions replaced with an x
     return directions;
 }
 
@@ -376,7 +421,7 @@ void shipGen()
                 //The current ship is whereever the loop is currently at, based on the row and colum index
                 //Ships are spawned on one spot, then extended east, west, south, or north depending on their size
                 
-                char * avalDirections = avaliableDirections(ships[randoShipsIndex],i,j);
+                char * avalDirections = checkAvaliableDirections(ships[randoShipsIndex],i,j);
 
                 //calls the spawn check function to see if a ship has directions it can spawn that arent forbidden on this current spot,
                 //as checked by the avalDirections above
