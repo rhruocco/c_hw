@@ -26,17 +26,18 @@ bool spaceChecker(int currentRow, int currentCol)
         return false;
     }
 
-    int loopBeginPoint;
+    int loopBeginPoint = 0;
     int loopEndPoint = 0;
-
-    int threeEast = currentCol + 3;
-    int threeWest = currentCol - 3;
-    int threeNorth = currentRow - 3;
-    int threeSouth = currentRow + 3;
 
     //Checks South of current location
     loopBeginPoint = currentRow + 1;
     loopEndPoint = currentRow + 3;
+
+    if (loopEndPoint > boardSize)
+    {
+        loopEndPoint = boardSize;
+    }
+
     for (int i = loopBeginPoint; i <= loopEndPoint; i++)
     {
         if (*(board + i * boardSize + currentCol) == 1)
@@ -48,6 +49,12 @@ bool spaceChecker(int currentRow, int currentCol)
     //Checks North of current location
     loopBeginPoint = currentRow - 1;
     loopEndPoint = currentRow -3;
+
+     if (loopEndPoint < 0)
+    {
+        loopEndPoint = 0;
+    }
+
     for (int i = loopBeginPoint; i >= loopEndPoint; i--)
     {
          if (*(board + i * boardSize + currentCol) == 1)
@@ -59,6 +66,12 @@ bool spaceChecker(int currentRow, int currentCol)
     //Checks East of current location
     loopBeginPoint = currentCol + 1;
     loopEndPoint = currentCol + 3;
+
+     if (loopEndPoint > boardSize)
+    {
+        loopEndPoint = boardSize;
+    }
+
     for (int j = loopBeginPoint; j <= loopEndPoint; j++)
     {
          if (*(board + currentRow * boardSize + j) == 1)
@@ -70,6 +83,11 @@ bool spaceChecker(int currentRow, int currentCol)
     //Checks West of current location
     loopBeginPoint = currentCol - 1;
     loopEndPoint = currentCol - 3;
+
+     if (loopEndPoint < 0)
+    {
+        loopEndPoint = 0;
+    }
     for (int j = loopBeginPoint; j >= loopEndPoint; j--)
     {
          if (*(board + currentRow * boardSize + j) == 1)
@@ -84,23 +102,12 @@ bool spaceChecker(int currentRow, int currentCol)
 //The further east, the greater the column value
 bool checker(int shipSize, int currentRow, int currentCol, char direction)
 {
-    //this bool will be returned at the end. it'll remain true until something makes it false
-    bool canSpawn = true;
-
-    //These are calculated below
-    //These are parameters for two loops that check if there's a ship 3 spaces away
-    //from the ship it's currently checking thats aligned the same (vertically or horizontal)
-    int threeAwayFromFirstPiece = 0;
-    int threeAwayFromLastPiece = 0;
-
     int lastPiece = 0;
-
     
     //this switch statement changes the values above based on which direction the ship will spawn in.
     switch(direction)
     {
         case 'n':
-
         lastPiece = currentRow - shipSize + 1; 
         if (lastPiece < 0)
         {
@@ -168,7 +175,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
         default:
         break;
     }
-    return canSpawn;
+    return true;
 }
 
 //this calls each direction's check to see which directions a ship can spawn in given its coordinates
@@ -189,26 +196,12 @@ char * checkAvaliableDirections(int shipSize, int currentRow, int currentCol)
     return directions;
 }
 
-bool shipsLeft(int * ships)  //checks if any ships are left to spawn
-{
-    bool shipsLeft = false;
-    for(int i = 0; i < 5; i++)
-    {
-        if (ships[i] != 0)
-        {
-            shipsLeft = true;
-        }
-    }
-
-    return shipsLeft;
-}
-
 //spawns a ship based on the passed in direction, by going through a loop and changing the 0's to 1's
 void spawnShip(int currentRow, int currentCol, int shipToSpawn, char direction)
 {
     //the row or col (depending on the direction the ship's spawning) of the last piece
     int lastPiece = 0;
-    std::cout <<"\nspawnShip\n";
+    //std::cout <<"\nspawnShip\n";
     switch (direction)
     {
         case 'n':
@@ -268,15 +261,11 @@ void shipGen()
             shipSpawnRng = rand() % 99 + 1;
 
             //only does this if based on rng and if there's any ships left
-            if (shipSpawnRng > 50 && shipsLeft(ships))
+            if (shipSpawnRng > 50)
             {
                 //this picks a random ship from the list. the while loop runs until it picks a non 0 value
-                
-                //while (ships[randoShipsIndex] == 0)
-                //{
-                    randoShipsIndex = rand() % 3 + 1;
+                randoShipsIndex = rand() % 3 + 1;
                     
-                //}
 
                 //creates a list that avaliableFunctions fills with all the directions the current ship can spawn in.
                 //The current ship is whereever the loop is currently at, based on the row and colum index
@@ -287,16 +276,23 @@ void shipGen()
                 //calls the spawn check function to see if a ship has directions it can spawn that arent forbidden on this current spot,
                 //as checked by the avalDirections above
 
-                //similar randomization process to the randoShipIndex variable above, only for an index for the array of allowed directions
                 randoSpawnDirectionIndex = rand() % 2 + 1;
-
+            
+                
                 //calls the spawnShip function to begin the spawning process at wherever the loop is at. (represented by i for row and j for col)
                 //then, that ship is given a value of 0 in the ships array so it doesnt get spawned again
 
                     spawnShip(i, j, ships[randoShipsIndex], avalDirections[randoSpawnDirectionIndex]);
-                    ships[randoShipsIndex] = 0;
+                    if (avalDirections[randoSpawnDirectionIndex] != 'x')
+                    {
+                        ships[randoShipsIndex] = 0;
+                    }
             }
             
+        }
+        for (int a = 0; a < 5; a++)
+        {
+            std:: cout << ships[a];
         }
     }
 }
@@ -320,6 +316,7 @@ void printBoard()
 
 
 //makes a board full of zeroes
+////modified from: https://gist.github.com/kstatz12/1675e6823134f0c4437734148a9dcce3
 void makeEmptyBoard()
 {
     for(int i = 0; i < boardSize; i++)
@@ -344,11 +341,13 @@ int main()
     
     board = create_2d_array();
     makeEmptyBoard();
+
     srand (time(NULL));
 
     shipGen();
     printBoard();
 
+    free(board);
     return 0;
 } 
 // gcc battleship2.cpp -lstdc++
