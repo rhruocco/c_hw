@@ -14,6 +14,72 @@ int * create_2d_array()
     return (int*)malloc(boardSize * boardSize *sizeof(int));
 }
 
+//This checker runs on each individual space of a ship's potential location.
+//It returns whether or not the passed in space is safe to spawn on.
+//It checks to make sure there are no ships within 3 spaces in all 4 directions, as well as its current location
+//This method is called in a for loop in checker() below
+bool spaceChecker(int currentRow, int currentCol)
+{
+    //checks to see if the space its been given is currentely occupied
+    if (*(board + currentRow * boardSize + currentCol) == 1)
+    {
+        return false;
+    }
+
+    int loopBeginPoint;
+    int loopEndPoint = 0;
+
+    int threeEast = currentCol + 3;
+    int threeWest = currentCol - 3;
+    int threeNorth = currentRow - 3;
+    int threeSouth = currentRow + 3;
+
+    //Checks South of current location
+    loopBeginPoint = currentRow + 1;
+    loopEndPoint = currentRow + 3;
+    for (int i = loopBeginPoint; i <= loopEndPoint; i++)
+    {
+        if (*(board + i * boardSize + currentCol) == 1)
+        {
+            return false;
+        }
+    }
+
+    //Checks North of current location
+    loopBeginPoint = currentRow - 1;
+    loopEndPoint = currentRow -3;
+    for (int i = loopBeginPoint; i >= loopEndPoint; i--)
+    {
+         if (*(board + i * boardSize + currentCol) == 1)
+        {
+            return false;
+        }
+    }
+
+    //Checks East of current location
+    loopBeginPoint = currentCol + 1;
+    loopEndPoint = currentCol + 3;
+    for (int j = loopBeginPoint; j <= loopEndPoint; j++)
+    {
+         if (*(board + currentRow * boardSize + j) == 1)
+        {
+            return false;
+        }
+    }
+
+    //Checks West of current location
+    loopBeginPoint = currentCol - 1;
+    loopEndPoint = currentCol - 3;
+    for (int j = loopBeginPoint; j >= loopEndPoint; j--)
+    {
+         if (*(board + currentRow * boardSize + j) == 1)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 //The further south, the greater the row value
 //The further east, the greater the column value
 bool checker(int shipSize, int currentRow, int currentCol, char direction)
@@ -27,22 +93,76 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
     int threeAwayFromFirstPiece = 0;
     int threeAwayFromLastPiece = 0;
 
+    int lastPiece = 0;
+
     
     //this switch statement changes the values above based on which direction the ship will spawn in.
     switch(direction)
     {
         case 'n':
 
-        //for (int i = currentRow; i >= )
+        lastPiece = currentRow - shipSize + 1; 
+        if (lastPiece < 0)
+        {
+            return false;
+        }
+
+        for (int i = currentRow; i >= lastPiece;i--)
+        {
+            if (!spaceChecker(currentRow, currentCol))
+            {
+                return false;
+            }
+        }
         break;
 
         case 's':
+        lastPiece = currentRow - shipSize + 1; 
+        if (lastPiece > boardSize)
+        {
+            return false;
+        }
+
+        for (int i = currentRow; i <= lastPiece;i++)
+        {
+            if (!spaceChecker(currentRow, currentCol))
+            {
+                return false;
+            }
+        }
         break;
 
         case 'e':
+        lastPiece = currentCol + shipSize - 1; 
+
+        if (lastPiece > boardSize)
+        {
+            return false;
+        }
+
+        for (int j = currentCol; j <= lastPiece;j++)
+        {
+            if (!spaceChecker(currentRow, currentCol))
+            {
+                return false;
+            }
+        }
         break;
 
         case 'w':
+        lastPiece = currentCol - shipSize + 1; 
+        if (lastPiece < 0)
+        {
+            return false;
+        }
+
+        for (int j = currentCol; j >= lastPiece;j--)
+        {
+            if (!spaceChecker(currentRow, currentCol))
+            {
+                return false;
+            }
+        }
         break;
 
         default:
@@ -134,18 +254,18 @@ void shipGen()
     char * avalDirections = new char;
     //The 5 ships are: Carrier (occupies 5 spaces), Battleship (4), Cruiser (3), Submarine (3), and Destroyer (2).
     int ships[5] = {5,4,3,3,2};
-    int shipSpawnRng = 56;
+    int shipSpawnRng = 0;
     int randoSpawnDirectionIndex = 0;
 
     int randoShipsIndex = 0;
 
     //this loop checks every spot on the board
-    for(int i = 0; i < boardSize; i++)
+    for(int i = 0; i <= boardSize; i++)
     {
-        for (int j  = 0; j < boardSize; j++)
+        for (int j  = 0; j <= boardSize; j++)
         {
             
-            shipSpawnRng--;
+            shipSpawnRng = rand() % 99 + 1;
 
             //only does this if based on rng and if there's any ships left
             if (shipSpawnRng > 50 && shipsLeft(ships))
@@ -154,7 +274,7 @@ void shipGen()
                 
                 //while (ships[randoShipsIndex] == 0)
                 //{
-                    randoShipsIndex = rand() % 4;
+                    randoShipsIndex = rand() % 3 + 1;
                     
                 //}
 
@@ -168,7 +288,7 @@ void shipGen()
                 //as checked by the avalDirections above
 
                 //similar randomization process to the randoShipIndex variable above, only for an index for the array of allowed directions
-                randoSpawnDirectionIndex = rand() % 3;
+                randoSpawnDirectionIndex = rand() % 2 + 1;
 
                 //calls the spawnShip function to begin the spawning process at wherever the loop is at. (represented by i for row and j for col)
                 //then, that ship is given a value of 0 in the ships array so it doesnt get spawned again
@@ -199,6 +319,18 @@ void printBoard()
 }
 
 
+//makes a board full of zeroes
+void makeEmptyBoard()
+{
+    for(int i = 0; i < boardSize; i++)
+    {
+        for(int j = 0; j < boardSize; j++)
+        {
+        *(board + i * boardSize + j) = 0;
+        }
+    }
+}
+
 
 int main()
 {
@@ -211,6 +343,7 @@ int main()
     std::cout << std::endl;
     
     board = create_2d_array();
+    makeEmptyBoard();
     srand (time(NULL));
 
     shipGen();
