@@ -26,12 +26,9 @@ bool spaceChecker(int currentRow, int currentCol)
         return false;
     }
 
-    int loopBeginPoint = 0;
-    int loopEndPoint = 0;
-
     //Checks South of current location
-    loopBeginPoint = currentRow + 1;
-    loopEndPoint = currentRow + 3;
+    int loopBeginPoint = currentRow + 1;
+    int loopEndPoint = currentRow + 3;
 
     if (loopEndPoint > boardSize)
     {
@@ -108,7 +105,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
     switch(direction)
     {
         case 'n':
-        lastPiece = currentRow - shipSize + 1; 
+        lastPiece = currentRow - shipSize; 
         if (lastPiece < 0)
         {
             return false;
@@ -116,7 +113,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
 
         for (int i = currentRow; i >= lastPiece;i--)
         {
-            if (!spaceChecker(currentRow, currentCol))
+            if (!spaceChecker(i, currentCol))
             {
                 return false;
             }
@@ -124,7 +121,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
         break;
 
         case 's':
-        lastPiece = currentRow - shipSize + 1; 
+        lastPiece = currentRow + shipSize; 
         if (lastPiece > boardSize)
         {
             return false;
@@ -132,7 +129,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
 
         for (int i = currentRow; i <= lastPiece;i++)
         {
-            if (!spaceChecker(currentRow, currentCol))
+            if (!spaceChecker(i, currentCol))
             {
                 return false;
             }
@@ -149,7 +146,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
 
         for (int j = currentCol; j <= lastPiece;j++)
         {
-            if (!spaceChecker(currentRow, currentCol))
+            if (!spaceChecker(currentRow, j))
             {
                 return false;
             }
@@ -165,7 +162,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
 
         for (int j = currentCol; j >= lastPiece;j--)
         {
-            if (!spaceChecker(currentRow, currentCol))
+            if (!spaceChecker(currentRow, j))
             {
                 return false;
             }
@@ -258,13 +255,13 @@ void shipGen()
         for (int j  = 0; j <= boardSize; j++)
         {
             
-            shipSpawnRng = rand() % 99 + 1;
+            shipSpawnRng = rand() % 101;
 
             //only does this if based on rng and if there's any ships left
             if (shipSpawnRng > 50)
             {
                 //this picks a random ship from the list. the while loop runs until it picks a non 0 value
-                randoShipsIndex = rand() % 3 + 1;
+                randoShipsIndex = rand() % 5;
                     
 
                 //creates a list that avaliableFunctions fills with all the directions the current ship can spawn in.
@@ -276,12 +273,13 @@ void shipGen()
                 //calls the spawn check function to see if a ship has directions it can spawn that arent forbidden on this current spot,
                 //as checked by the avalDirections above
 
-                randoSpawnDirectionIndex = rand() % 2 + 1;
+                randoSpawnDirectionIndex = rand() % 5;
             
                 
                 //calls the spawnShip function to begin the spawning process at wherever the loop is at. (represented by i for row and j for col)
                 //then, that ship is given a value of 0 in the ships array so it doesnt get spawned again
 
+                    std::cout <<"\n";
                     spawnShip(i, j, ships[randoShipsIndex], avalDirections[randoSpawnDirectionIndex]);
                     if (avalDirections[randoSpawnDirectionIndex] != 'x')
                     {
@@ -290,10 +288,10 @@ void shipGen()
             }
             
         }
-        for (int a = 0; a < 5; a++)
-        {
-            std:: cout << ships[a];
-        }
+        // for (int a = 0; a < 5; a++)
+        // {
+        //     std:: cout << ships[a];
+        // }
     }
 }
 
@@ -347,7 +345,7 @@ int main()
     shipGen();
     printBoard();
 
-    free(board);
+    //free(board);
     return 0;
 } 
 // gcc battleship2.cpp -lstdc++
