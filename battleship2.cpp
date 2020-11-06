@@ -7,6 +7,7 @@
 
 int * board;
 int boardSize = 0;
+int moves = 0;
 
 //Taken from: https://gist.github.com/kstatz12/1675e6823134f0c4437734148a9dcce3
 int * create_2d_array()
@@ -333,6 +334,193 @@ void makeEmptyBoard()
     }
 }
 
+//returns the value of the space passed in. called multiple times by fire()
+int whatsHere(int row, int col)
+{
+    int here = *(board + row * boardSize + col);
+    switch(here)
+    {
+        case 0:
+        case 1:
+            moves++;
+            break;
+        default:
+        break;
+    }
+    return *(board + row * boardSize + col);
+}
+
+//checks the space passed in as well as the adjacent ones, and returns whether it was a hit, miss, or near miss
+int fire(int row, int col)
+{
+    //For checking the adjacent spaces
+    int northSpace = row-1;
+    int southSpace = row+1;
+    int eastSpace = col+1;
+    int westSpace = col-1;
+
+    bool nearMiss = false;
+
+    //to be returned after the checks are done. 2 is a miss, 3 is a near miss, 4 is a hit, 5 means the space was previously checked
+    int hitOrMiss = 0;
+
+    if (whatsHere(northSpace,col)  == 1 || whatsHere(southSpace,col)  == 1 || whatsHere(row,eastSpace) == 1 || whatsHere(row,westSpace) == 1)
+    {
+        nearMiss = true;
+    }
+
+    hitOrMiss = *(board + row * boardSize + col);
+
+    switch(hitOrMiss)
+    {
+        case 0:
+            if (nearMiss)
+            {
+                hitOrMiss = 3;
+            }
+            else
+            {
+                hitOrMiss = 2;
+            }
+            break;
+
+        case 1:
+            hitOrMiss = 4;
+            break;
+
+        case 2:
+        case 3:
+        case 4:
+            hitOrMiss = 5;
+            break;
+
+        default:
+        break;
+            
+    }
+
+    return hitOrMiss;
+}
+
+//Searches the entire board for ships. if there's a single '1' on the board, returns false
+bool allDone()
+{
+    for(int i = 0; i < boardSize; i++)
+    {
+        for(int j = 0; j < boardSize; j++)
+        {
+          if (*(board + i * boardSize + j) == 1)
+          {
+              return false;
+          }
+        }
+    }
+    return true;
+}
+
+//called when a ship is found. goes in all four directions looking for the whole ship
+void foundShip(int row, int col)
+{
+  //bool 
+}
+
+
+//used for checking spaces adjacent to another space. returns whether or not it's found the ship
+bool nearMissChecker(int row, int col)
+{
+    bool found = false;
+    int here = whatsHere(row, col);
+
+    switch (here)
+    {
+        case 0:
+            *(board + row * boardSize + col) = 2;
+            break;
+        case 1:
+            *(board + row * boardSize + col) = 4;
+            found = true;
+            break;
+        default:
+        break;
+    }
+
+    return found;
+}
+
+//checks the area around a near miss for a ship, returns how many moves it took to find it
+void nearMiss(int row, int col)
+{
+    bool foundIt = false;
+    int northSpace = row-1;
+    int southSpace = row+1;
+    int eastSpace = col+1;
+    int westSpace = col-1;
+
+    //checks North, then proceeds to check the rest of the directions only if it hasnt found the ship yet
+    foundIt = nearMissChecker(northSpace, col);
+
+    if(!foundIt)
+    {
+        foundIt = nearMissChecker(southSpace, col);
+
+        if(!foundIt)
+        {
+            foundIt = nearMissChecker(row, eastSpace);
+            
+            if(!foundIt)
+            {
+                foundIt = nearMissChecker(row, westSpace);
+            }
+        }
+        
+    }
+}
+
+//tries to hit every ship on the board in as few moves as possible. returns the moves it took
+void boardSearch()
+{
+    
+    bool done = false;
+
+    int rowToCheck = 0;
+    int colToCheck = 0;
+
+    int fireResult = 0;
+
+    //searches for the ships until it's done
+    while (!done)
+    {
+        //selects a random row and col to fire upon
+        rowToCheck = rand() % boardSize + 1;
+        colToCheck = rand() % boardSize + 1;
+
+        //fires, is returned what is found there
+        fireResult = fire(rowToCheck, colToCheck);
+
+        //unless that space has been already fired upon, increments moves and assigns that spot accordingly
+        if(fireResult != 5)
+        {
+            *(board + rowToCheck * boardSize + colToCheck) = fireResult;
+
+            switch (fireResult)
+            {
+                case 3:
+                nearMiss(rowToCheck, colToCheck);
+                break;
+
+                case 4:
+                foundShip(rowToCheck, colToCheck);
+                break;
+
+                default:
+                break;
+
+            }
+
+        }
+        done = allDone();
+    }
+}
 
 int main()
 {
@@ -352,6 +540,18 @@ int main()
     //ships are added, then the board is printed
     shipGen();
     printBoard();
+
+    //only exists so the user can press enter to continue
+    // char useless = 'd';
+
+    // std::cout << "Press Enter to see how long\nit takes to find your ships!";
+
+    // useless = std::cin.get();
+
+    boardSearch();
+    printBoard();
+
+    std::cout <<"Found all Ships in "<<moves<<" moves.";
 
     free(board);
     return 0;
