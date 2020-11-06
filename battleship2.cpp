@@ -95,17 +95,24 @@ bool spaceChecker(int currentRow, int currentCol)
     return true;
 }
 
-//The further south, the greater the row value
-//The further east, the greater the column value
+//The master checker, responsible for running the spaceChecker based on the ship size,
+//location and direction to spawn it's given
 bool checker(int shipSize, int currentRow, int currentCol, char direction)
 {
+
+    //this int gives either the row or the col (set later, depending on the direction passed in)
+    //of the last piece of the potential ship
     int lastPiece = 0;
     
-    //this switch statement changes the values above based on which direction the ship will spawn in.
+    //this switch statement changes the way the space checker loop runs
+    //based on the direction it's checking
     switch(direction)
     {
         case 'n':
         lastPiece = currentRow - shipSize; 
+
+        //a similar if is checked in every direction, to make sure the last piece isnt
+        //going to end up off the board
         if (lastPiece < 0)
         {
             return false;
@@ -137,7 +144,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
         break;
 
         case 'e':
-        lastPiece = currentCol + shipSize - 1; 
+        lastPiece = currentCol + shipSize; 
 
         if (lastPiece > boardSize)
         {
@@ -154,7 +161,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
         break;
 
         case 'w':
-        lastPiece = currentCol - shipSize + 1; 
+        lastPiece = currentCol - shipSize; 
         if (lastPiece < 0)
         {
             return false;
@@ -175,7 +182,7 @@ bool checker(int shipSize, int currentRow, int currentCol, char direction)
     return true;
 }
 
-//this calls each direction's check to see which directions a ship can spawn in given its coordinates
+//this calls checker() with each direction and updates the list of avaliable directions to spawn in accordingly
 char * checkAvaliableDirections(int shipSize, int currentRow, int currentCol)
 {
     //a list of all the directions
@@ -193,12 +200,14 @@ char * checkAvaliableDirections(int shipSize, int currentRow, int currentCol)
     return directions;
 }
 
-//spawns a ship based on the passed in direction, by going through a loop and changing the 0's to 1's
+//spawns a ship based on the passed in direction, by going through a loop and changing the designated 0's
+//on the board to 1's
 void spawnShip(int currentRow, int currentCol, int shipToSpawn, char direction)
 {
     //the row or col (depending on the direction the ship's spawning) of the last piece
     int lastPiece = 0;
-    //std::cout <<"\nspawnShip\n";
+
+    //this switch spawns the ship based on the direction its given
     switch (direction)
     {
         case 'n':
@@ -238,16 +247,24 @@ void spawnShip(int currentRow, int currentCol, int shipToSpawn, char direction)
     }
   }
 
-//big method for putting every ship on the board
+//loops through the entire board and determines whether or not it WILL or CAN spawn a ship there
 void shipGen()
 {
+    //the list of avaliable directions a potential ship can spawn, updated later in the loop
     char * avalDirections = new char;
-    //The 5 ships are: Carrier (occupies 5 spaces), Battleship (4), Cruiser (3), Submarine (3), and Destroyer (2).
-    int ships[5] = {5,4,3,3,2};
-    int shipSpawnRng = 0;
-    int randoSpawnDirectionIndex = 0;
 
+    //The 5 ships are: Carrier (occupies 5 spaces), Battleship (4), Cruiser (3), Submarine (3), and Destroyer (2)
+    //This array helps me keep track of them, and make sure each is spawned just once
+    int ships[5] = {5,4,3,3,2};
+
+    //an rng that determines whether a ship will spawn at that spot
+    int shipSpawnRng = 0;
+    //indexes for getting random directions/ships, randomly generated and used later in loop
+    int randoSpawnDirectionIndex = 0;
     int randoShipsIndex = 0;
+
+    //the number of ships spawned, checked later in the loop to make sure no more than 5 are spawned
+    int shipsSpawned = 0;
 
     //this loop checks every spot on the board
     for(int i = 0; i <= boardSize; i++)
@@ -257,44 +274,34 @@ void shipGen()
             
             shipSpawnRng = rand() % 101;
 
-            //only does this if based on rng and if there's any ships left
-            if (shipSpawnRng > 50)
+            //where the ship spawning process begins, with a calculation to make one more likely to spawn
+            //when 1 more is needed on the board
+            if (shipSpawnRng > 50 - (shipsSpawned % 4))
             {
-                //this picks a random ship from the list. the while loop runs until it picks a non 0 value
+                //tindex of ship to spawn from the ships array above is randomly chosen
                 randoShipsIndex = rand() % 5;
-                    
-
-                //creates a list that avaliableFunctions fills with all the directions the current ship can spawn in.
-                //The current ship is whereever the loop is currently at, based on the row and colum index
-                //Ships are spawned on one spot, then extended east, west, south, or north depending on their size
                 
+                //updates the list of avaliable directions to spawn in by running checkAvaliableDirections.
                 avalDirections = checkAvaliableDirections(ships[randoShipsIndex],i,j);
 
-                //calls the spawn check function to see if a ship has directions it can spawn that arent forbidden on this current spot,
-                //as checked by the avalDirections above
-
-                randoSpawnDirectionIndex = rand() % 5;
-            
-                
-                //calls the spawnShip function to begin the spawning process at wherever the loop is at. (represented by i for row and j for col)
-                //then, that ship is given a value of 0 in the ships array so it doesnt get spawned again
-
-                    std::cout <<"\n";
-                    spawnShip(i, j, ships[randoShipsIndex], avalDirections[randoSpawnDirectionIndex]);
-                    if (avalDirections[randoSpawnDirectionIndex] != 'x')
+                //a direction from the avaliable directions to spawn in is randomly chosen
+                randoSpawnDirectionIndex = rand() % 4;
+                    
+                    //checks if there are < 5 ships on the board, if the random direction chosen is an actual direction and not an 'x',
+                    //and if the random ship chosen isn't a 0
+                    if (shipsSpawned < 5 && avalDirections[randoSpawnDirectionIndex] != 'x' && ships[randoShipsIndex] > 0)
                     {
+                        //calls spawnShip() to spawn the ship at the current coordinates of the loop,
+                        //sets the ship it just spawned to 0 in the ships array so it doesnt spawn againn'
+                        //and increments the number of ships spawned
+                        spawnShip(i, j, ships[randoShipsIndex], avalDirections[randoSpawnDirectionIndex]);
                         ships[randoShipsIndex] = 0;
+                        shipsSpawned++;
                     }
             }
-            
         }
-        // for (int a = 0; a < 5; a++)
-        // {
-        //     std:: cout << ships[a];
-        // }
     }
 }
-
 
 //modified from: https://gist.github.com/kstatz12/1675e6823134f0c4437734148a9dcce3
 void printBoard()
@@ -329,23 +336,24 @@ void makeEmptyBoard()
 
 int main()
 {
-    //the player is asked for a board size, then the board is generated, given ships, and printed.
+    //the player is asked for a board size,
     
     std::cout << "How big do you want the board to be?\nEnter 1 number, boards will be square:";
 
     std::cin >> boardSize;
-
-    std::cout << std::endl;
     
+    //a 2darray is created, then filled with 0's
     board = create_2d_array();
     makeEmptyBoard();
 
+    //ensures rng's are random each time, assigns a random seed based on the time
     srand (time(NULL));
 
+    //ships are added, then the board is printed
     shipGen();
     printBoard();
 
-    //free(board);
+    free(board);
     return 0;
 } 
 // gcc battleship2.cpp -lstdc++
