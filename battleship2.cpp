@@ -414,49 +414,64 @@ char adjacentChecker(int row, int col)
 
 //called when a ship is found. checks the adjacent spots to find the rest of the ship
 void shipSweep(int row, int col, char direction)
-{
-    //keeps track of whether or not parts of the ship has been hit in the north and the south
-    int incrementer = 0;
-    
+{   
     switch (direction)
     {
+        //checks to make sure there is more of the ship north of its current location.
+        //there are similar loops for the other directions
         case 'n':
-        case 's':
-        //these loops continue hitting north /souththere is no longer a ship detected north/south.
-        // it checks both north and south in case it entered in the middle of a ship. same loop for horizontal
-        //directions below
-        do 
-        {
-            markSpace(row + incrementer, col, 4);
-            incrementer--;
-        }
-        while (adjacentChecker(row - incrementer, col) == 'n');
+         for (int i = 1; i < 4; i++)
+            {
+                if (whatsHere(row - i, col) == 1)
+                {
+                markSpace(row - i, col, 4);
+                }
+                else
+                {
+                    return;
+                }
+            }
+         break;
 
-        incrementer = 0;
-        do 
-        {
-            markSpace(row + incrementer, col, 4);;
-            incrementer++;
-        }
-        while (adjacentChecker(row + incrementer, col) == 's');
+        case 's':
+            for (int i = 1; i < 4; i++)
+            {
+                if (whatsHere(row + i, col) == 1)
+                {
+                markSpace(row + i, col, 4);
+                }
+                else
+                {
+                    return;
+                }
+            }
         break;
 
         case 'e':
+        for (int j = 1; j < 4; j++)
+        {
+            if (whatsHere(row, col + j) == 1)
+            {
+                markSpace(row, col + j, 4);
+            }
+            else
+            {
+                return;
+            }
+            break;
+        }
         case 'w':
-        do 
-        {
-            markSpace(row, col + incrementer, 4);
-            incrementer++;
+         for (int j = 1; j < 4; j++)
+         {
+            if (whatsHere(row, col - j) == 1)
+            {
+                markSpace(row, col - j, 4);
+            }
+            else
+            {
+                return;
+            }
         }
-        while (adjacentChecker(row, col + incrementer) == 'e');
-
-        incrementer = 0;
-        do
-        {
-            markSpace(row, col + incrementer, 4);
-            incrementer--;
-        }
-        while (adjacentChecker(row, col - incrementer) == 'w');
         break;
 
         default:
@@ -546,16 +561,20 @@ void boardSearch()
                     default:
                         markSpace(i, j, 2);
                         break;
-
                 }
-
+                break;
+                
                 case 1:
                     markSpace(i,j,4);
                     shipSweep(i,j, shipsThisWay);
                     break;
-                    
+
                 default:
                 break;
+            }
+            if (allDone())
+            {
+                return;
             }
         }
     }
