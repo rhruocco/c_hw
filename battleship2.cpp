@@ -334,6 +334,8 @@ void makeEmptyBoard()
     }
 }
 
+// Ship checker arrays below-------------------------
+
 //returns the value of the space passed in. called multiple times by fire(). returns -1 if a bad value is passed
 int whatsHere(int row, int col)
 {
@@ -345,12 +347,15 @@ int whatsHere(int row, int col)
         {
            here = *(board + row * boardSize + col);
         }
+        else
+        {
+            here = -1;
+        }
     }
     else
     {
       here  = -1;
     }
-    
     
     switch(here)
     {
@@ -358,62 +363,68 @@ int whatsHere(int row, int col)
         case 1:
             moves++;
             break;
+        
         default:
         break;
     }
     return here;
 }
 
-//checks the space passed in as well as the adjacent ones, and returns whether it was a hit, miss, or near miss
-int fire(int row, int col)
+//checks all spots adjacent to the spot it's passed, and returns the direction of the ship it located.
+//if it doesnt locate anything, it returns an x
+char adjacentChecker(int row, int col)
 {
-    //For checking the adjacent spaces
-    int northSpace = row-1;
-    int southSpace = row+1;
-    int eastSpace = col+1;
-    int westSpace = col-1;
-
-    bool nearMiss = false;
-
-    //to be returned after the checks are done. 2 is a miss, 3 is a near miss, 4 is a hit, 5 means the space was previously checked
-    int hitOrMiss = 0;
-
-    if (whatsHere(northSpace,col)  == 1 || whatsHere(southSpace,col)  == 1 || whatsHere(row,eastSpace) == 1 || whatsHere(row,westSpace) == 1)
+    //checks for a ship in each direction, returns its corresponding char
+    if (whatsHere(row - 1, col) == 1)
     {
-        nearMiss = true;
+        return 'n';
     }
 
-    hitOrMiss = *(board + row * boardSize + col);
-
-    switch(hitOrMiss)
+    if (whatsHere(row + 1, col) == 1)
     {
-        case 0:
-            if (nearMiss)
-            {
-                hitOrMiss = 3;
-            }
-            else
-            {
-                hitOrMiss = 2;
-            }
-            break;
+        return 's';
+    }
 
-        case 1:
-            hitOrMiss = 4;
-            break;
+    if (whatsHere(row, col + 1) == 1)
+    {
+        return 'e';
+    }
 
-        case 2:
-        case 3:
-        case 4:
-            hitOrMiss = 5;
-            break;
+    if(whatsHere(row, col-1) == 1)
+    {
+        return 'w';
+    }
 
-        default:
-        break;
+    return 'x';
+}
+
+//checks the space passed in as well as the adjacent ones, and returns whether it was a hit, miss, or near miss
+void fire(int row, int col)
+{
+    if (whatsHere(row, col) == 0)
+    {
+        //a char that records whether theres a ship near this location
+        char theresSomethingThisWay = adjacentChecker(row, col);
+
+        switch(theresSomethngThisWay)
+        {
+            case 'n':
+                *(board + row * boardSize + col) = 3;
+                shipSweep(row -1, col);
+            case 's':
+                *(board + row * boardSize + col) = 3;
+                shipSweep(row + 1, col);
+            case 'e':
+                *(board + row * boardSize + col) = 3;
+                shipSweep(row, col + 1);
+            case 'w':
+                *(board + row * boardSize + col) = 3;
+                shipSweep(row, col - 1);
             
+            default:
+            break;
+        }
     }
-
-    return hitOrMiss;
 }
 
 //Searches the entire board for ships. if there's a single '1' on the board, returns false
@@ -432,93 +443,19 @@ bool allDone()
     return true;
 }
 
-//called when a ship is found, this method checks to see if the rest of the ship is north or south of the
-//location passed. returns true if so, false if not
-bool verticalSweep(int row, int col)
+//called when a ship is found. checks the adjacent spots to find the rest of the ship
+void shipSweep(int row, int col)
 {
     //keeps track of whether or not parts of the ship has been hit in the north and the south
-    bool hitStuffNorth = false;
-    bool hitStuffSouth = false;
-
-    //this var keeps track of the current row the loop is sweeping
-    int currentRowSweeped = row - 1;
+    char whereIsTheShip = adjacentChecker(row, col);
     
-    //north check
-    if (whatsHere(currentRowSweeped, col) == 1)
+    switch (whereIsTheShip)
     {
-        hitStuffNorth = true;
-        do 
-        {
-            //assigns the current spot its on to 'hit', then continues north
-            *(board + currentRowSweeped * boardSize + col) == 4;
-            currentRowSweeped--;
-        }
-        while (whatsHere(currentRowSweeped, col) == 1);
-    }
-    
-    //retarts the sweep, this time at one SOUTH of the initial location
-    currentRowSweeped = row + 1;
-
-    if (whatsHere(currentRowSweeped, col) == 1)
-    {
-        hitStuffSouth = true;
-        do 
-        {
-            //assigns the current spot its on to 'hit', then continues south
-            *(board + currentRowSweeped * boardSize + col) == 4;
-            currentRowSweeped--;
-        }
-        while (whatsHere(currentRowSweeped, col) == 1);
+        case 'n':
+            
     }
 
-    if (hitStuffNorth || hitStuffSouth)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
     
-}
-
-//same as vertical sweep but for horizontal
-void horizontalSweep(int row, int col)
-{
-    //keeps track of whether or not parts of the ship has been hit in the north and the south
-    bool hitStuffEast = false;
-    bool hitStuffWest = false;
-
-    //this var keeps track of the current row the loop is sweeping
-    int currentColSweeped = col + 1;
-    
-    //east check
-    if (whatsHere(row, currentColSweeped) == 1)
-    {
-        hitStuffEast = true;
-        do 
-        {
-            //assigns the current spot its on to 'hit', then continues north
-            *(board + row * boardSize + currentColSweeped) == 4;
-            currentColSweeped++;
-        }
-        while (whatsHere(row, currentColSweeped) == 1);
-    }
-    
-    //retarts the sweep, this time at one WEST of the initial location
-    currentColSweeped = row - 1;
-
-    if (whatsHere(row, currentColSweeped) == 1)
-    {
-        hitStuffWest = true;
-        do
-        {
-            //assigns the current spot its on to 'hit', then continues north
-            *(board + row * boardSize + currentColSweeped) == 4;
-            currentColSweeped--;
-        }
-        while (whatsHere(row, currentColSweeped) == 1);
-    }    
 }
 
 //called when a ship is found. goes in all four directions looking for the whole ship
@@ -532,7 +469,6 @@ void foundShip(int row, int col)
   if (!isTheShipDestroyed)
   {
     horizontalSweep(row,col);
-
   }
 }
 
@@ -549,7 +485,6 @@ bool shipFinder(int row, int col)
             *(board + row * boardSize + col) = 2;
             break;
         case 1:
-            *(board + row * boardSize + col) = 4;
             foundShip(row,col);
             found = true;
             break;
@@ -596,44 +531,17 @@ void nearMiss(int row, int col)
 //tries to hit every ship on the board in as few moves as possible. returns the moves it took
 void boardSearch()
 {
-    bool done = false;
-
     int rowToCheck = 0;
     int colToCheck = 0;
 
-    int fireResult = 0;
-
     //searches for the ships until it's done
-    while (!done)
+    while (!allDone())
     {
         //selects a random row and col to fire upon
         rowToCheck = rand() % boardSize + 1;
         colToCheck = rand() % boardSize + 1;
 
-        //fires, is returned what is found there
-        fireResult = fire(rowToCheck, colToCheck);
-
-        //unless that space has been already fired upon, increments moves and assigns that spot accordingly
-        if(fireResult != 5)
-        {
-            *(board + rowToCheck * boardSize + colToCheck) = fireResult;
-
-            switch (fireResult)
-            {
-                case 3:
-                nearMiss(rowToCheck, colToCheck);
-                break;
-
-                case 4:
-                foundShip(rowToCheck, colToCheck);
-                break;
-
-                default:
-                break;
-
-            }
-        }
-        done = allDone();
+        fire(rowToCheck, colToCheck);
     }
 }
 
@@ -655,13 +563,6 @@ int main()
     //ships are added, then the board is printed
     shipGen();
     printBoard();
-
-    //only exists so the user can press enter to continue
-    // char useless = 'd';
-
-    // std::cout << "Press Enter to see how long\nit takes to find your ships!";
-
-    // useless = std::cin.get();
 
     boardSearch();
     printBoard();
