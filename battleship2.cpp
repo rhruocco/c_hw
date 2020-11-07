@@ -348,18 +348,6 @@ int whatsHere(int row, int col)
     {
         here = *(board + row * boardSize + col);
     }
-
-
-    switch(here)
-    {
-        case 0:
-        case 1:
-            moves++;
-            break;
-        
-        default:
-        break;
-    }
     return here;
 }
 
@@ -369,6 +357,7 @@ int markSpace (int row, int col, int value)
 {
     if (value > whatsHere(row, col))
     {
+        moves++;
         *(board + row * boardSize + col) = value;
     }
 
@@ -415,101 +404,47 @@ char adjacentChecker(int row, int col)
 //called when a ship is found. checks the adjacent spots to find the rest of the ship
 void shipSweep(int row, int col, char direction)
 {   
+    //these are to try and predict the next part of the ship
+    char nextDirection = 'x';
+
+    int nextCol = col;
+    int nextRow = row;
+
     switch (direction)
     {
         //checks to make sure there is more of the ship north of its current location.
         //there are similar loops for the other directions
         case 'n':
-         for (int i = 1; i < 4; i++)
-            {
-                if (whatsHere(row - i, col) == 1)
-                {
-                markSpace(row - i, col, 4);
-                }
-                else
-                {
-                    return;
-                }
-            }
+            nextRow = row - 1;
+                markSpace(nextRow, col, 4);
+                nextDirection = adjacentChecker(nextRow, col);
          break;
 
         case 's':
-            for (int i = 1; i < 4; i++)
-            {
-                if (whatsHere(row + i, col) == 1)
-                {
-                markSpace(row + i, col, 4);
-                }
-                else
-                {
-                    return;
-                }
-            }
+                nextRow = row + 1;
+                markSpace(nextRow, col, 4);
+                nextDirection = adjacentChecker(nextRow, col);
         break;
 
         case 'e':
-        for (int j = 1; j < 4; j++)
-        {
-            if (whatsHere(row, col + j) == 1)
-            {
-                markSpace(row, col + j, 4);
-            }
-            else
-            {
-                return;
-            }
+                nextCol = col + 1;
+                markSpace(row, nextCol, 4);
+                nextDirection = adjacentChecker(row, nextCol);
             break;
-        }
         case 'w':
-         for (int j = 1; j < 4; j++)
-         {
-            if (whatsHere(row, col - j) == 1)
-            {
-                markSpace(row, col - j, 4);
-            }
-            else
-            {
-                return;
-            }
-        }
+                nextCol = col - 1;
+                markSpace(row, nextCol, 4);
+                nextDirection = adjacentChecker(row, nextCol);
         break;
 
         default:
         break;
     }
+    if (nextDirection != 'x')
+    {   
+    shipSweep(nextRow, nextCol, nextDirection);
+    }
 }
-
-//checks the space passed in as well as the adjacent ones, and returns whether it was a hit, miss, or near miss
-// void fire(int row, int col)
-// {
-//     int whatsOnThisSpot = whatsHere(row, col);
-
-//     if (whatsOnThisSpot == 0)
-//     {
-//         //a char that records whether theres a ship near this location
-//         char theresSomethingThisWay = adjacentChecker(row, col);
-
-//         switch(theresSomethingThisWay)
-//         {
-//             case 'n':
-//                 shipSweep(row -1, col);
-//             case 's':
-//                 shipSweep(row + 1, col);
-//             case 'e':
-//                 shipSweep(row, col + 1);
-//             case 'w':
-//                 shipSweep(row, col - 1);
-
-//             default:
-//              markSpace(row, col, 2);
-//             break;
-//         }
-//     }
-//     else if (whatsOnThisSpot == 1)
-//     {
-//         shipSweep(row,col);
-//     }
-// }
 
 //Searches the entire board for ships. if there's a single '1' on the board, returns false
 bool allDone()
@@ -537,9 +472,9 @@ void boardSearch()
     char shipsThisWay = 'x';
 
     //searches for the ships until it's done
-    for(int i = 0; i < boardSize; i++)
+    for(int i = 0; i < boardSize; i+= 3)
     {
-        for(int j = 0; j < boardSize; j++)
+        for(int j = 0; j < boardSize; j+= 3)
         {
             whatBeHere = whatsHere(i, j);
 
@@ -563,7 +498,7 @@ void boardSearch()
                         break;
                 }
                 break;
-                
+
                 case 1:
                     markSpace(i,j,4);
                     shipSweep(i,j, shipsThisWay);
@@ -578,11 +513,11 @@ void boardSearch()
             }
         }
     }
-        // selects a random row and col to fire upon
-        // rowToCheck = rand() % boardSize + 1;
-        // colToCheck = rand() % boardSize + 1;
+    if (!allDone)
+    {
+        std::cout <<"\nFAILED";
+    }
 
-        // fire(rowToCheck, colToCheck);
 }
 
 int main()
@@ -602,7 +537,6 @@ int main()
 
     //ships are added, then the board is printed
     shipGen();
-    printBoard();
 
     boardSearch();
     printBoard();
