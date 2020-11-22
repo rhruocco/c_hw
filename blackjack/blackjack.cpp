@@ -1,14 +1,16 @@
 #include <iostream>
 #include <stdio.h>
+#include "playerheader.h"
 
-#include <player.h>;
 using namespace std;
 
 int main()
 {
-    Player p = new Player();
+    Player p;
+    p.~Player();
 
     return 0;
 }
 
-//gcc blackjack.cpp -lstdc++
+// gcc blackjack.cpp -lstdc++
+// c_hw-master/blackjack

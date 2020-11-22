@@ -1,18 +1,30 @@
 #include "playerheader.h"
+#include <vector>
 
-using namespace playerHeader;
+using namespace std;
 
-vector<int> getHand()
+vector<int> playerheader::getHand()
 {
     return hand;
 }
 
-int getCash()
+int playerheader::getCash()
 {
     return cash;
 }
 
-void giveOrTakeCash(int amount)
+void playerheader::giveOrTakeCash(int amount)
 {
     cash += amount;
+}
+
+void playerheader::Player()
+{
+    cash = 0;
+}
+
+void playerheader::~Player()
+{
+    cout <<"I am dead";
+    delete this;
 }
