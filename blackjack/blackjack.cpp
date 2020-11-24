@@ -4,11 +4,15 @@
 
 using namespace std;
 
+Player playa, dealer;
+
+void Game()
+{
+
+}
+
 int main()
 {
-    Player p;
-    //p.~Player();
-
     return 0;
 }
 

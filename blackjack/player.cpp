@@ -1,30 +1,38 @@
 #include "playerheader.h"
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
-vector<int> playerheader::getHand()
+
+//Returns the player's current hand
+vector<int> Player::getHand()
 {
     return hand;
 }
 
-int playerheader::getCash()
+//Returns how much cash the player has
+int Player::getCash()
 {
     return cash;
 }
 
-void playerheader::giveOrTakeCash(int amount)
+
+// Adjusts the player's cash. Called when they either win or lose money. If they lose, a negative int is passed in
+void Player::giveOrTake(int amount)
 {
     cash += amount;
 }
 
-playerheader::Player()
+//Player constructor, sets cash to starting amount
+Player::Player()
 {
-    cash = 0;
+    cash = 1000;
 }
 
-playerheader::~Player()
+//Player destructor
+Player::~Player()
 {
-    cout <<"I am dead";
-    delete this;
+    //cout <<"I am dead";
+    //delete this;
 }
