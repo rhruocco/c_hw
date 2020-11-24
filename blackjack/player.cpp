@@ -18,12 +18,12 @@ void playerheader::giveOrTakeCash(int amount)
     cash += amount;
 }
 
-void playerheader::Player()
+playerheader::Player()
 {
     cash = 0;
 }
 
-void playerheader::~Player()
+playerheader::~Player()
 {
     cout <<"I am dead";
     delete this;

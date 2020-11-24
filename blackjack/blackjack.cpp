@@ -7,10 +7,10 @@ using namespace std;
 int main()
 {
     Player p;
-    p.~Player();
+    //p.~Player();
 
     return 0;
 }
 
-// gcc blackjack.cpp -lstdc++
+// gcc blackjack.cpp player.cpp -lstdc++
 // c_hw-master/blackjack
