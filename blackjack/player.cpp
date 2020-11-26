@@ -27,6 +27,7 @@ void Player::giveOrTake(int amount)
 //Player constructor, sets cash to starting amount
 Player::Player()
 {
+    hand.reserve(10);
     cash = 1000;
 }
 

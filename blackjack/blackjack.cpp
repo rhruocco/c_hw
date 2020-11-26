@@ -3,26 +3,60 @@
 #include "playerheader.h"
 #include <vector>
 #include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
 Player playa, dealer;
+vector<int> deck;
 
-void game()
+//chooses a random card from the deck to deal. also removes that card from the deck
+int deal()
 {
-    int bet = 0;
     int randomIndex = 0;
-    vector<int> deck = {1,2,3,4,5,6,7,8,9,10,10,10,1,2,3,4,5,6,7,8,9,10,10,10,1,2,3,4,5,6,7,8,9,10,10,10,1,2,3,4,5,6,7,8,9,10,10,10,};
-    
     randomIndex = rand() % deck.size() + 1;
 
-    dealer.draw(deck[randomIndex]);
-
-
+    int cardDealt = deck[randomIndex];
+    deck.erase(deck.begin() + randomIndex - 1);
+    return cardDealt;
 }
+
+//empties, then refills the deck. called at round starts
+void resetDeck()
+{
+    //erases the current deck
+    for (int i = 0; i < deck.size(); i++)
+    {
+        deck.erase(deck.begin() + i);
+    }
+
+    //fills the deck. possibly a dumb way to do this
+    for (int i = 0; i < 4; i++)
+    {
+        for(int g = 1; g <= 10; g++)
+        {
+            deck.push_back(g);
+        }
+    }    
+}
+
+//the gameplay method, called 100 times OR until someone busts
+void game()
+{
+    int bet = playa.getCash() / 10;
+    
+    resetDeck();
+
+    dealer.draw(deal());
+
+    playa.draw(deal());
+}
+
+
 
 int main()
 {
+    deck.reserve(52);
     for (int i = 0; i < 100; i++)
     {
         game();
