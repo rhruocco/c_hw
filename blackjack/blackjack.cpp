@@ -40,6 +40,21 @@ void resetDeck()
     }    
 }
 
+//logic for deciding whether or not the player will hit
+bool shouldIHit()
+{
+    int pSum = playa.getSum();
+    int dSum = dealer.getSum();
+    if (pSum > dSum || pSum == 21)
+    {
+        return false;
+    }
+    if (pSum == dSum)
+    {
+    } 
+
+}
+
 //the gameplay method, called 100 times OR until someone busts
 void game()
 {
@@ -48,8 +63,17 @@ void game()
     resetDeck();
 
     dealer.draw(deal());
+    int faceDownDealerCard = deal();
 
     playa.draw(deal());
+    playa.draw(deal());
+
+    if(shouldIHit)
+    {
+        playa.draw(deal());
+    }
+    dealer.draw(faceDownDealerCard);
+
 }
 
 

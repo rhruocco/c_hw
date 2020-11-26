@@ -9,7 +9,7 @@ using namespace std;
     {
         private:
 
-        int cash;
+        int cash,sum;
         vector<int> hand;
 
         public:
@@ -20,6 +20,7 @@ using namespace std;
             ~Player();
             void draw(int card);
             int getSum();
+            void calcSum();
     };
 
 #endif

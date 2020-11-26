@@ -42,13 +42,19 @@ Player::~Player()
 void Player::draw(int card)
 {
     hand.push_back(card);
+    calcSum();
 }
 
 //returns the sum of the player's current hand
 int Player::getSum()
 {
-    int sum, aces = 0;
-    //int aces = 0;
+    return sum;
+}
+
+//calculates the sum of the player's current hand
+void Player::calcSum()
+{
+    int aces = 0;
 
     //adds every card together, except for aces, which is done below seperately
     for (int i = 0; i < hand.size(); i++)
@@ -75,5 +81,4 @@ int Player::getSum()
             sum++;
         }
     }
-    return sum;
 }
