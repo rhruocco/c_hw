@@ -36,3 +36,43 @@ Player::~Player()
     //cout <<"I am dead";
     //delete this;
 }
+
+//adds a card to the player's hand
+void Player::draw(int card)
+{
+    hand.push_back(card);
+}
+
+//returns the sum of the player's current hand
+int Player::getSum()
+{
+    int sum, aces = 0;
+    //int aces = 0;
+
+    //adds every card together, except for aces, which is done below seperately
+    for (int i = 0; i < hand.size(); i++)
+    {
+        if (hand[i] == 1 || 11)
+        {
+            aces++;
+        }
+        else
+        {
+            sum += hand[i];
+        }
+    }
+
+    //adds any aces (represented as 1's) seperately to determine whether they should be counted as 1's or 11's
+    for (int a = 0; a < aces; a++)
+    {
+        if((11 + sum) > 21)
+        {
+            sum += 1;
+        }
+        else
+        {
+            sum++;
+        }
+    }
+    return sum;
+}

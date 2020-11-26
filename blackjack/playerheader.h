@@ -18,6 +18,8 @@ using namespace std;
             void giveOrTake(int amount);
             Player();
             ~Player();
+            void draw(int card);
+            int getSum();
     };
 
 #endif
