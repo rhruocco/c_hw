@@ -14,8 +14,7 @@ int wins, losses, ties = 0;
 //chooses a random card from the deck to deal. also removes that card from the deck
 int deal()
 {
-    int randomIndex = 0;
-    randomIndex = rand() % deck.size() + 1;
+    int randomIndex = rand() % deck.size() + 1;
 
     int cardDealt = deck[randomIndex];
     deck.erase(deck.begin() + randomIndex - 1);
@@ -41,11 +40,21 @@ void resetDeck()
     }    
 }
 
+void printVector(vector<int> vecta)
+{
+    for (int i = 0; i < vecta.size(); i++)
+    {
+        cout <<vecta[i]<<"  ";
+    }
+    cout<<"\n";
+}
+
 //logic for deciding whether or not the player will hit
 bool shouldIHit()
 {
     int pSum = playa.getSum();
     int dSum = dealer.getSum();
+
     if (pSum > dSum || pSum == 21)
     {
         return false;
@@ -102,25 +111,26 @@ bool isGameOver(int bet)
 {
     int dSum = dealer.getSum();
     int pSum = playa.getSum();
-    if (dSum > 21)
+    
+    if (dSum > 21 || pSum > 21)
     {
-        if(pSum <= 21)
-        {
-            wins++;
-           playa.giveOrTake(bet);
-        }
-           return true; 
-    }
-
-    if (pSum > 21)
-    {
+        
         if (dSum <= 21)
         {
-            losses++;
-            playa.giveOrTake(-bet);
+           losses++;
+           playa.giveOrTake(-bet);
         }
-
-        return true;
+        else if(pSum <= 21)
+        {
+           wins++;
+           playa.giveOrTake(bet);
+        }
+        else
+        {
+            ties++;
+        }
+        
+         return true; 
     }
 
     if (dSum >= 17 && pSum > dSum)
@@ -136,7 +146,7 @@ bool isGameOver(int bet)
 //the gameplay method, called 100 times OR until someone busts
 void game()
 {
-    int bet = playa.getCash() / 10;
+    int bet = playa.getCash() / 10 + (rand() % 11);
     
     resetDeck();
 
@@ -146,16 +156,10 @@ void game()
     playa.draw(deal());
     playa.draw(deal());
 
-    if(shouldIHit)
-    {
-        playa.draw(deal());
-    }
-
     dealer.draw(faceDownDealerCard);
 
     while (!isGameOver(bet))
     {
-
     if (shouldIHit)
     {
         playa.draw(deal());
@@ -165,20 +169,29 @@ void game()
     {
         dealer.draw(deal());
     }
+
     }
+    //cout <<"\n"<<dealer.getSum()<<"\n"<<playa.getSum();
+
+    dealer.resetDeck();
+    playa.resetDeck();
 }
 
 
 
 int main()
 {
-    srand(time(NULL));
-    
+    srand (time(NULL));
     deck.reserve(52);
     for (int i = 0; i < 100; i++)
     {
         game();
+        if (playa.getCash() <= 0)
+        {
+            i = 100;
+        }
     }
+
     if (playa.getCash() > 0)
     {
     cout << "The Player ended with $"<<playa.getCash();
@@ -187,8 +200,8 @@ int main()
     {
         cout << "The Player went broke!";
     }
-    cout <<"\nWins: "<<wins<<"\nTies: "<<ties<<"\nLosses: "<<losses;
-    
+    cout <<"\nWins: "<<wins<<"\nTies: "<<ties<<"\nLosses: "<<losses<<"\n";
+  
     return 0;
 }
 

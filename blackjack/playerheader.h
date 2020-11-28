@@ -21,6 +21,7 @@ using namespace std;
             void draw(int card);
             int getSum();
             void calcSum();
+            void resetDeck();
     };
 
 #endif

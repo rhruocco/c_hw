@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 //Returns the player's current hand
 vector<int> Player::getHand()
 {
@@ -15,6 +14,16 @@ vector<int> Player::getHand()
 int Player::getCash()
 {
     return cash;
+}
+
+//resets the players deck. also sets the sum to zero
+void Player::resetDeck()
+{
+    for (int i = 0; i < hand.size(); i++)
+    {
+        hand.erase(hand.begin() + i);
+    }
+    sum = 0;
 }
 
 
@@ -34,8 +43,6 @@ Player::Player()
 //Player destructor
 Player::~Player()
 {
-    //cout <<"I am dead";
-    //delete this;
 }
 
 //adds a card to the player's hand
@@ -55,16 +62,17 @@ int Player::getSum()
 void Player::calcSum()
 {
     int aces = 0;
-
+    sum = 0;
     //adds every card together, except for aces, which is done below seperately
     for (int i = 0; i < hand.size(); i++)
     {
-        if (hand[i] == 1 || 11)
+        if (hand[i] == (1 || 11))
         {
             aces++;
         }
         else
         {
+            
             sum += hand[i];
         }
     }
@@ -74,7 +82,7 @@ void Player::calcSum()
     {
         if((11 + sum) > 21)
         {
-            sum += 1;
+            sum += 11;
         }
         else
         {
