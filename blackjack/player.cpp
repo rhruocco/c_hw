@@ -80,7 +80,7 @@ void Player::calcSum()
     //adds any aces (represented as 1's) seperately to determine whether they should be counted as 1's or 11's
     for (int a = 0; a < aces; a++)
     {
-        if((11 + sum) > 21)
+        if((11 + sum) <= 21)
         {
             sum += 11;
         }

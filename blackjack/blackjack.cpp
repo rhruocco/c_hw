@@ -40,107 +40,102 @@ void resetDeck()
     }    
 }
 
-void printVector(vector<int> vecta)
-{
-    for (int i = 0; i < vecta.size(); i++)
-    {
-        cout <<vecta[i]<<"  ";
-    }
-    cout<<"\n";
-}
-
 //logic for deciding whether or not the player will hit
 bool shouldIHit()
 {
     int pSum = playa.getSum();
     int dSum = dealer.getSum();
-
-    if (pSum > dSum || pSum == 21)
+    //this determines how likely the player is to hit based on how close they are to busting
+    if (pSum >= 21)
     {
         return false;
     }
+    int riskiness = 0;
 
-    if (pSum == dSum)
+    switch(pSum)
     {
-        //this determines how likely the player is to hit based on how close they are to busting
-        int riskiness = 0;
+        case 15:
+        riskiness = 60;
+        break;
+        case 16:
+        riskiness = 55;
+        break;
+        case 17:
+        riskiness = 50;
+        break;
+        case 18:
+        riskiness = 35;
+        break;
+        case 19:
+        riskiness = 5;
+        break;
+        case 20:
+        riskiness = 2;
+        break;
+        case 21:
+        riskiness = 0;
+        break;
 
-        switch(pSum)
-        {
-            case 17:
-            riskiness = 85;
-            break;
-            case 18:
-            riskiness = 55;
-            break;
-            case 19:
-            riskiness = 15;
-            break;
-            case 20:
-            riskiness = 2;
-            break;
-            case 21:
-            riskiness = 0;
-            break;
-
-            default:
-            riskiness = 100;
-            break;
-        }
-
-        //randomly determines whether or not to hit based on riskiness
-        int hitRng = rand() % 101;
-        if (hitRng <= riskiness)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        default:
+        riskiness = 100;
+        break;
     }
 
-    if (pSum < dSum)
+    //randomly determines whether or not to hit based on riskiness
+    int hitRng = rand() % 101;
+    if (hitRng <= riskiness)
     {
         return true;
     }
+
+    return false;
 }
 
-//checks to see if the game is over, and awards the bet based on its outcome if so. returns true if game's over
-bool isGameOver(int bet)
+//determines who wins, updates game stats and assigns bets accordinglly
+void whoWins(int bet)
 {
     int dSum = dealer.getSum();
     int pSum = playa.getSum();
-    
-    if (dSum > 21 || pSum > 21)
+
+    if (pSum > 21 || dSum > 21)
     {
-        
-        if (dSum <= 21)
+        if (pSum <= 21)
         {
-           losses++;
-           playa.giveOrTake(-bet);
+            wins++;
+            playa.giveOrTake(bet);
         }
-        else if(pSum <= 21)
+        else if (dSum <= 21)
         {
-           wins++;
-           playa.giveOrTake(bet);
+            losses++;
+            playa.giveOrTake(-bet);
         }
         else
         {
             ties++;
         }
-        
-         return true; 
+        return; 
+    }
+    
+    if (pSum < dSum)
+    {
+        losses++;
+        playa.giveOrTake(-bet);
+        return;
     }
 
-    if (dSum >= 17 && pSum > dSum)
+    if (pSum > dSum)
     {
         wins++;
         playa.giveOrTake(bet);
-        return true;
+        return;
     }
 
-    return false;
+    if (pSum == dSum)
+    {
+        ties++;
+        return;
+    }
+
 }
 
 //the gameplay method, called 100 times OR until someone busts
@@ -156,28 +151,22 @@ void game()
     playa.draw(deal());
     playa.draw(deal());
 
-    dealer.draw(faceDownDealerCard);
-
-    while (!isGameOver(bet))
-    {
-    if (shouldIHit)
+    while (shouldIHit())
     {
         playa.draw(deal());
     }
 
-    if (dealer.getSum() < 17)
+    dealer.draw(faceDownDealerCard);
+    while (dealer.getSum() < 17)
     {
         dealer.draw(deal());
     }
 
-    }
-    //cout <<"\n"<<dealer.getSum()<<"\n"<<playa.getSum();
+    whoWins(bet);
 
     dealer.resetDeck();
     playa.resetDeck();
 }
-
-
 
 int main()
 {
@@ -204,5 +193,3 @@ int main()
   
     return 0;
 }
-
-// gcc blackjack.cpp player.cpp -lstdc++
