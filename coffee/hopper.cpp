@@ -13,10 +13,10 @@ int Hopper::grind()
 {
     while (beans > 0)
     {
-        beans -= 25;
         cout <<"\n"<<beans<<" Beans left to grind...\n";
+        beans -= 25;
     }
-    cout <<"\nDone grinding!";
+    cout <<"\nDone grinding!\n";
 }
 
 //Constructor. Takes in the amount of water passed into the hopper and multiplies by 50 to get the beans needed
