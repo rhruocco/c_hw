@@ -25,13 +25,12 @@ void Reservoir::pour()
 //Boils the water
 void Reservoir::boil()
 {
-    while (temp > 180)
+    while (temp < 180)
     {
         temp += 15;
-        cout <<"\nWater is "<<temp<<" degrees...\n"
+        cout <<"\nWater is "<<temp<<" degrees...\n";
     }
     cout <<"\nDone boiling!";
 
     pour();
 }
-
