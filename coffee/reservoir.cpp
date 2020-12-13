@@ -34,3 +34,22 @@ void Reservoir::boil()
 
     pour();
 }
+
+//Constructor
+Reservoir::Reservoir()
+{
+    cout << "How many cups of Joe would you like?\n(No more than 4)\n";
+    cin >> cups;
+    while (cups > 4)
+    {
+        cout << "\nIt can't hold that much.\nPlease enter a number, 1-4\n";
+        cin >> cups;
+    }
+    
+}
+
+//Destructor
+Reservoir::~Reservoir()
+{
+
+}

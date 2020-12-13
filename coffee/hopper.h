@@ -11,7 +11,7 @@ class Hopper
     public:
     int grind();
     int getBeans();
-    Hopper();
+    Hopper(int cups);
     ~Hopper();
 };
 

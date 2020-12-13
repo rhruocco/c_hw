@@ -6,3 +6,13 @@
 #include "hopper.h"
 
 using namespace std;
+
+Reservoir res;
+Hopper hop(res.getCups());
+
+int main()
+{
+    
+}
+
+//gcc coffee.cpp hopper.cpp reservoir.cpp -lstdc++

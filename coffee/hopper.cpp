@@ -18,3 +18,15 @@ int Hopper::grind()
     }
     cout <<"\nDone grinding!";
 }
+
+//Constructor. Takes in the amount of water passed into the hopper and multiplies by 50 to get the beans needed
+Hopper::Hopper(int cups)
+{
+    beans = cups * 50;
+}
+
+//Destructor
+Hopper::~Hopper()
+{
+
+}
