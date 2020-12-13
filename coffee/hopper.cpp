@@ -23,6 +23,7 @@ int Hopper::grind()
 Hopper::Hopper(int cups)
 {
     beans = cups * 50;
+    cout << "\nLoading "<<beans<<" beans...";
 }
 
 //Destructor

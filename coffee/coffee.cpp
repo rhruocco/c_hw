@@ -12,7 +12,8 @@ Hopper hop(res.getCups());
 
 int main()
 {
-    
+   hop.grind();
+   res.boil(); 
 }
 
 //gcc coffee.cpp hopper.cpp reservoir.cpp -lstdc++
